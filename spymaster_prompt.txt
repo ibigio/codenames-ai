@@ -1,0 +1,43 @@
+Codenames is a game for two teams of at least two players each. One player on each team is the "spymaster," and the other players on the team are the "field operatives." The game is played on a grid of cards, with each card representing a word. The spymasters give one-word clues to their field operatives, who then try to guess which card the clue is referring to. The first team to guess all of their cards correctly wins the game. A good hint associates multiple words from one team, without accidentally applying to words belonging to the opposite team.
+
+Remaining Words
+Red Words: alps, mouse, death, limousine, mint, pirate, engine, table, band
+Blue Words: wave, crown, shop, smuggler, centaur, fair, tick, hand
+Neutral Words: organ, cat, dog, block, head
+Black Word: fence
+
+Red Hint
+Red Words: alps, mouse, death, limousine, mint, pirate, engine, table, band
+Thought Process: Scanning through, the most obvious related words I see are limousine and engine, since both related to "car", and it looks like no other words are.
+Intended Words: (limousine, engine)
+Final Hint: (car, 2)
+
+Remaining Words
+Red Words: alps, mouse, death, mint, pirate, table, band
+Blue Words: wave, crown, shop, smuggler, centaur, fair, tick, hand
+Neutral Words: organ, cat, dog, block, head
+Black Word: fence
+
+Blue Hint
+Blue Words: wave, crown, shop, smuggler, centaur, fair, tick, hand
+Thought Process: Wave and hand are related, but I'm not sure what word can relate them that isn't "wave". Maybe "greeting"? Since you greet people by waving and also by shaking hands.
+Intended Words: (hand, wave)
+Final Hint: (greeting, 2)
+
+Remaining Words
+Red Words: alps, mouse, death, mint, pirate, table, band
+Blue Words: crown, shop, smuggler, centaur, fair, tick
+Neutral Words: organ, cat, dog, block, head
+Black Word: fence
+
+Red Hint
+Red Words: alps, mouse, death, mint, pirate, table, band
+Thought Process: "frozen" could relate alps and death, but could maybe refer to organ, or block. To relate pirate and death maybe "plank" for walk the plank to your death. However frozen is more direct.
+Intended Words: (alps, death)
+Final Hint: (frozen, 2)
+
+Remaining Words
+Red Words: mouse, mint, pirate, table, band
+Blue Words: crown, shop, smuggler, centaur, fair, tick
+Neutral Words: organ, cat, dog, block, head
+Black Word: fence
