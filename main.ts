@@ -4,7 +4,7 @@ import { GPT3Guesser } from "./guessers.ts";
 import { GPT3Nominator } from "./nominators.ts";
 
 async function main() {
-  let game_state = {
+  const game_state = {
     words: {
       red: ["screen", "robin", "rock", "bond", "bug", "dice", "log", "mammoth"],
       blue: [

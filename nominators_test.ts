@@ -4,7 +4,7 @@ import {
   assert,
 } from "https://deno.land/std@0.156.0/testing/asserts.ts";
 
-let sample_game_state = {
+const sample_game_state = {
   words: {
     red: ["screen", "robin", "rock", "bond", "bug", "dice", "log", "mammoth"],
     blue: [

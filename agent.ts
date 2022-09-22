@@ -4,8 +4,19 @@ import {
   AttributedHint,
   AttributedGuess,
   Hint,
-  GameState,
+  CompleteGameState,
+  PartialGameState,
 } from "./interfaces.ts";
+
+const complete_to_partial = (
+  game_state: CompleteGameState
+): PartialGameState => {
+  const words: string[] = [];
+  for (const [_, value] of Object.entries(game_state.words)) {
+    words.concat(value);
+  }
+  return { words: words, turns: game_state.turns };
+};
 
 export class Agent {
   nominators: Nominator[];
@@ -89,8 +100,8 @@ export class Agent {
     return scored_hints[0].hint.hint;
   }
 
-  update_state(update: GameState): void {
+  update_state(update: CompleteGameState): void {
     this.nominators.forEach((n) => n.update_state(update));
-    this.guessers.forEach((n) => n.update_state(update));
+    this.guessers.forEach((n) => n.update_state(complete_to_partial(update)));
   }
 }

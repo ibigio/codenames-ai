@@ -25,7 +25,7 @@ interface Turn {
   guess: WordSet;
 }
 
-export interface GameState {
+export interface CompleteGameState {
   words: {
     red: string[];
     blue: string[];
@@ -35,10 +35,15 @@ export interface GameState {
   turns: Turn[];
 }
 
+export interface PartialGameState {
+  words: WordSet;
+  turns: Turn[];
+}
+
 export interface Guesser {
   id: string;
   guess(hint: AttributedHint): Promise<AttributedGuess[]>;
-  update_state(update: GameState): void;
+  update_state(update: PartialGameState): void;
 }
 
 export interface Nomination {
@@ -49,5 +54,5 @@ export interface Nomination {
 export interface Nominator {
   id: string;
   nominate(): Promise<Nomination[]>;
-  update_state(update: GameState): void;
+  update_state(update: CompleteGameState): void;
 }

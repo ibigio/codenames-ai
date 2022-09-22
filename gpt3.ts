@@ -30,7 +30,7 @@ const default_options = {
 };
 
 export class GPT3Client {
-  complete = async (options: Config): Promise<Completion[]> => {
+  complete = async (options: Config): Promise<Completion[] | undefined> => {
     try {
       const response = await fetch("https://api.openai.com/v1/completions", {
         method: "POST",

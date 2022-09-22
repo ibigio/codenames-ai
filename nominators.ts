@@ -1,7 +1,7 @@
 import {
   Nominator,
   Nomination,
-  GameState,
+  CompleteGameState,
   AttributedHint,
   WordSet,
   Hint,
@@ -67,27 +67,35 @@ export class GPT3Nominator implements Nominator {
   id = "GPT3Nominator";
   team = "Red";
   gpt3_client: GPT3Client;
-  game_state?: GameState;
+  game_state?: CompleteGameState;
   num_nominations: number;
 
-  constructor(game_state?: GameState, num_nominations?: number) {
+  constructor(game_state?: CompleteGameState, num_nominations?: number) {
     this.game_state = game_state;
     this.gpt3_client = new GPT3Client();
     this.num_nominations = num_nominations ?? 1;
   }
 
+  get_game_state(): CompleteGameState {
+    if (this.game_state == undefined) {
+      throw new Error("tried to get undefined game state");
+    }
+    return this.game_state;
+  }
+
   format_game_state() {
+    const words = this.get_game_state().words;
     let s = "Remaining Words\n";
-    s += `Red Words: ${this.game_state?.words.red.join(", ")}\n`;
-    s += `Blue Words: ${this.game_state?.words.blue.join(", ")}\n`;
-    s += `Neutral Words: ${this.game_state?.words.neutral.join(", ")}\n`;
-    s += `Black Word: ${this.game_state?.words.black.join(", ")}\n`;
+    s += `Red Words: ${words.red.join(", ")}\n`;
+    s += `Blue Words: ${words.blue.join(", ")}\n`;
+    s += `Neutral Words: ${words.neutral.join(", ")}\n`;
+    s += `Black Word: ${words.black.join(", ")}\n`;
     return s;
   }
 
   format_hint_prompt() {
     let prompt = `Red Hint\n`;
-    prompt += `Red Words: ${this.game_state?.words.red.join(", ")}\n`;
+    prompt += `Red Words: ${this.get_game_state().words.red.join(", ")}\n`;
     prompt += "Thought Process:";
     return prompt;
   }
@@ -102,12 +110,20 @@ export class GPT3Nominator implements Nominator {
     return prompt;
   }
 
-  parse_hint = (hint_text: string): Hint => {
+  parse_hint = (hint_text: string): Hint | undefined => {
     const [word, number] = hint_text
       .trim()
       .slice(1, -1)
       .split(",")
       .map((x) => x.trim());
+
+    if (word == undefined || number == undefined) {
+      return undefined;
+    }
+    if (isNaN(+number) && isNaN(+word)) {
+      return undefined;
+    }
+
     // for some reason might be swapped
     if (isNaN(+number)) {
       return {
@@ -121,7 +137,7 @@ export class GPT3Nominator implements Nominator {
     };
   };
 
-  parse_word_set = (word_set: string): WordSet => {
+  parse_word_set = (word_set: string): WordSet | undefined => {
     return word_set
       .trim()
       .slice(1, -1)
@@ -138,9 +154,17 @@ export class GPT3Nominator implements Nominator {
     if (lines.length != 3) {
       return undefined;
     }
+    const hint = this.parse_hint(content_of(lines[2]));
+    const intended_words = this.parse_word_set(content_of(lines[1]));
+    if (hint == undefined || intended_words == undefined) {
+      return undefined;
+    }
+    if (intended_words.length != hint.number) {
+      return undefined;
+    }
     return {
-      hint: this.parse_hint(content_of(lines[2])),
-      intended_words: this.parse_word_set(content_of(lines[1])),
+      hint: hint,
+      intended_words: intended_words,
       nominator_id: this.id,
       metadata: { thought_process: lines[0] },
     };
@@ -154,6 +178,10 @@ export class GPT3Nominator implements Nominator {
       n: this.num_nominations,
     });
 
+    if (completion == undefined) {
+      return [];
+    }
+
     return completion
       .map((c) => this.parse_response(c.text))
       .filter((t): t is AttributedHint => !!t)
@@ -162,7 +190,7 @@ export class GPT3Nominator implements Nominator {
       }));
   }
 
-  update_state(update: GameState): void {
+  update_state(update: CompleteGameState): void {
     this.game_state = update;
   }
 }
