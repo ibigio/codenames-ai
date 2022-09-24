@@ -7,6 +7,7 @@ import {
   Hint,
 } from "./interfaces.ts";
 import { GPT3Client } from "./gpt3.ts";
+import { content_of, parse_word_set } from "./util.ts";
 
 // TODO: implement CompoundNominator
 
@@ -58,10 +59,6 @@ Neutral Words: organ, cat, dog, block, head
 Black Word: fence
 
 End of Game 1`;
-
-const content_of = (line: string) => {
-  return line.split(":")[1];
-};
 
 export class GPT3Nominator implements Nominator {
   id = "GPT3Nominator";
@@ -137,15 +134,6 @@ export class GPT3Nominator implements Nominator {
     };
   };
 
-  parse_word_set = (word_set: string): WordSet | undefined => {
-    return word_set
-      .trim()
-      .slice(1, -1)
-      .trim()
-      .split(",")
-      .map((word) => word.trim().toLowerCase());
-  };
-
   parse_response(response: string): AttributedHint | undefined {
     const lines = response
       .trim()
@@ -155,7 +143,7 @@ export class GPT3Nominator implements Nominator {
       return undefined;
     }
     const hint = this.parse_hint(content_of(lines[2]));
-    const intended_words = this.parse_word_set(content_of(lines[1]));
+    const intended_words = parse_word_set(content_of(lines[1]));
     if (hint == undefined || intended_words == undefined) {
       return undefined;
     }

@@ -1,5 +1,12 @@
 import { GPT3Client } from "./gpt3.ts";
-import { Guesser, AttributedGuess, PartialGameState } from "./interfaces.ts";
+import {
+  Guesser,
+  WordSet,
+  AttributedGuess,
+  PartialGameState,
+  Hint,
+} from "./interfaces.ts";
+import { content_of, parse_word_set } from "./util.ts";
 
 const PROMPT = `Codenames is a game for two teams of at least two players each. One player on each team is the "spymaster," and the other players on the team are the "field operatives." The game is played on a grid of cards, with each card representing a word. The spymasters give one-word clues to their field operatives, who then try to guess which card the clue is referring to. The first team to guess all of their cards correctly wins the game. A good hint associates multiple words from one team, without accidentally applying to words belonging to the opposite team.
 
@@ -40,33 +47,74 @@ export class GPT3Guesser implements Guesser {
     this.num_guesses = num_guesses ?? 1;
   }
 
-  format_game_state() {
-    return `Remaining Words: ${this.game_state?.words}\n`;
+  get_game_state(): PartialGameState {
+    if (this.game_state == undefined) {
+      throw new Error("tried to get undefined game state");
+    }
+    return this.game_state;
   }
 
-  format_hint_prompt() {
-    let prompt = `Red Hint\n`;
-    // prompt += `Red Words: ${this.game_state?.categorized_words.red.join(
-    //   ", "
-    // )}\n`;
-    // prompt += "Thought Process:";
+  parse_response(response: string): AttributedGuess | undefined {
+    const lines = response
+      .trim()
+      .split("\n")
+      .filter((line) => line.length > 0);
+    if (lines.length != 2) {
+      return undefined;
+    }
+    const guess = parse_word_set(content_of(lines[1]));
+    if (guess == undefined) {
+      return undefined;
+    }
+    return {
+      guess: guess,
+      guesser_id: this.id,
+      metadata: { thought_process: lines[0] },
+    };
+  }
+
+  format_hint(hint: Hint) {
+    return `(${hint.word}, ${hint.number})`;
+  }
+
+  format_game_state() {
+    return `Remaining Words: ${this.get_game_state()
+      .words.sort()
+      .join(", ")}\n`;
+  }
+
+  format_guess_prompt(hint: Hint) {
+    let prompt = `Red Hint: ${this.format_hint(hint)}\n`;
+    prompt += "Thought Process:";
     return prompt;
   }
 
-  construct_prompt() {
+  construct_prompt(hint: Hint) {
     let prompt = PROMPT;
     prompt += "\n\n";
     prompt += "Start of Game 2\n\n";
     prompt += this.format_game_state();
     prompt += "\n";
-    prompt += this.format_hint_prompt();
+    prompt += this.format_guess_prompt(hint);
     return prompt;
   }
 
-  guess(): Promise<AttributedGuess[]> {
-    throw new Error("Method not implemented.");
+  async guess(hint: Hint): Promise<AttributedGuess[]> {
+    const prompt = this.construct_prompt(hint);
+    const completion = await this.gpt3_client.complete({
+      prompt: prompt,
+      stop: ["Remaining Words"],
+      n: this.num_guesses,
+    });
+
+    if (completion == undefined) {
+      return [];
+    }
+    return completion
+      .map((c) => this.parse_response(c.text))
+      .filter((t): t is AttributedGuess => !!t);
   }
-  update_state(): void {
-    throw new Error("Method not implemented.");
+  update_state(update: PartialGameState): void {
+    this.game_state = update;
   }
 }

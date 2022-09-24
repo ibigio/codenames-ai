@@ -13,7 +13,7 @@ export interface AttributedHint {
 }
 
 export interface AttributedGuess {
-  attribution: AttributedHint;
+  // attribution: AttributedHint;
   guess: WordSet;
   guesser_id: string;
   metadata?: any;
@@ -42,7 +42,7 @@ export interface PartialGameState {
 
 export interface Guesser {
   id: string;
-  guess(hint: AttributedHint): Promise<AttributedGuess[]>;
+  guess(hint: Hint): Promise<AttributedGuess[]>;
   update_state(update: PartialGameState): void;
 }
 
