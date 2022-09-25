@@ -13,7 +13,6 @@ export interface AttributedHint {
 }
 
 export interface AttributedGuess {
-  // attribution: AttributedHint;
   guess: WordSet;
   guesser_id: string;
   metadata?: any;
@@ -40,19 +39,14 @@ export interface PartialGameState {
   turns: Turn[];
 }
 
-export interface Guesser {
+export interface GuessNominator {
   id: string;
-  guess(hint: Hint): Promise<AttributedGuess[]>;
+  nominate(hint: Hint): Promise<AttributedGuess[]>;
   update_state(update: PartialGameState): void;
 }
 
-export interface Nomination {
-  hint: AttributedHint;
-  metadata?: any;
-}
-
-export interface Nominator {
+export interface HintNominator {
   id: string;
-  nominate(): Promise<Nomination[]>;
+  nominate(): Promise<AttributedHint[]>;
   update_state(update: CompleteGameState): void;
 }

@@ -1,7 +1,7 @@
 import { Agent } from "./agent.ts";
 import { GPT3Client } from "./gpt3.ts";
-import { GPT3Guesser } from "./guessers.ts";
-import { GPT3Nominator } from "./nominators.ts";
+import { GPT3GuessNominator } from "./guess_nominators.ts";
+import { GPT3HintNominator } from "./hint_nominators.ts";
 
 async function main() {
   const game_state = {
@@ -34,8 +34,8 @@ async function main() {
   };
 
   const agent = new Agent({
-    nominators: [new GPT3Nominator()],
-    guessers: [new GPT3Guesser()],
+    hint_nominators: [new GPT3HintNominator()],
+    guess_nominators: [new GPT3GuessNominator()],
   });
 
   agent.update_state(game_state);

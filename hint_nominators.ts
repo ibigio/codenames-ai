@@ -1,9 +1,7 @@
 import {
-  Nominator,
-  Nomination,
+  HintNominator,
   CompleteGameState,
   AttributedHint,
-  WordSet,
   Hint,
 } from "./interfaces.ts";
 import { GPT3Client } from "./gpt3.ts";
@@ -60,7 +58,7 @@ Black Word: fence
 
 End of Game 1`;
 
-export class GPT3Nominator implements Nominator {
+export class GPT3HintNominator implements HintNominator {
   id = "GPT3Nominator";
   team = "Red";
   gpt3_client: GPT3Client;
@@ -158,7 +156,7 @@ export class GPT3Nominator implements Nominator {
     };
   }
 
-  async nominate(): Promise<Nomination[]> {
+  async nominate(): Promise<AttributedHint[]> {
     const prompt = this.construct_prompt();
     const completion = await this.gpt3_client.complete({
       prompt: prompt,
@@ -172,10 +170,7 @@ export class GPT3Nominator implements Nominator {
 
     return completion
       .map((c) => this.parse_response(c.text))
-      .filter((t): t is AttributedHint => !!t)
-      .map((t) => ({
-        hint: t,
-      }));
+      .filter((t): t is AttributedHint => !!t);
   }
 
   update_state(update: CompleteGameState): void {

@@ -13,7 +13,7 @@ export const parse_word_set = (word_set: string): WordSet | undefined => {
     .map((word) => word.trim().toLowerCase());
 };
 
-export const complete_to_partial_game_state = (
+export const complete_to_partial = (
   game_state: CompleteGameState
 ): PartialGameState => {
   let words: string[] = [];

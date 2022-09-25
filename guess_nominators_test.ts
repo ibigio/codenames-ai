@@ -2,9 +2,9 @@ import {
   assertEquals,
   assert,
 } from "https://deno.land/std@0.156.0/testing/asserts.ts";
-import { GPT3Guesser } from "./guessers.ts";
+import { GPT3GuessNominator } from "./guess_nominators.ts";
 import { AttributedGuess, Hint } from "./interfaces.ts";
-import { complete_to_partial_game_state } from "./util.ts";
+import { complete_to_partial } from "./util.ts";
 
 const sample_complete_game_state = {
   words: {
@@ -64,7 +64,7 @@ const sample_complete_game_state = {
   "tower",
 ];
 
-const sample_partial_game_state = complete_to_partial_game_state(
+const sample_partial_game_state = complete_to_partial(
   sample_complete_game_state
 );
 
@@ -73,7 +73,7 @@ Final Guess: (limousine, engine)
 `;
 
 Deno.test("game_state format", () => {
-  const g = new GPT3Guesser(sample_partial_game_state);
+  const g = new GPT3GuessNominator(sample_partial_game_state);
   const f = g.format_game_state();
   assert(
     f.includes(
@@ -83,7 +83,7 @@ Deno.test("game_state format", () => {
 });
 
 Deno.test("parse response", () => {
-  const g = new GPT3Guesser(sample_partial_game_state);
+  const g = new GPT3GuessNominator(sample_partial_game_state);
   const parsed_hint = g.parse_response(sample_guess);
   const expected_guess: AttributedGuess = {
     guess: ["limousine", "engine"],
@@ -97,7 +97,7 @@ Deno.test("parse response", () => {
 });
 
 Deno.test("construct prompt", () => {
-  const g = new GPT3Guesser(sample_partial_game_state);
+  const g = new GPT3GuessNominator(sample_partial_game_state);
   const sample_hint: Hint = {
     word: "hint",
     number: 2,
@@ -109,12 +109,22 @@ Thought Process:`)
   );
 });
 
-// Deno.test("produce guess", async () => {
-//   const g = new GPT3Guesser(sample_partial_game_state);
-//   const sample_hint: Hint = {
-//     word: "",
-//     number: 2,
-//   };
-//   const guesses = await g.guess(sample_hint);
-//   console.log(guesses);
-// });
+Deno.test("produce guess", async () => {
+  const g = new GPT3GuessNominator(sample_partial_game_state);
+  const sample_hint: Hint = {
+    word: "computers",
+    number: 2,
+  };
+  const guesses = await g.nominate(sample_hint);
+  console.log(guesses);
+});
+
+Deno.test("produce guess", async () => {
+  const g = new GPT3GuessNominator(sample_partial_game_state, 5);
+  const sample_hint: Hint = {
+    word: "computers",
+    number: 2,
+  };
+  const guesses = await g.nominate(sample_hint);
+  console.log(guesses);
+});

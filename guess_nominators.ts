@@ -1,6 +1,6 @@
 import { GPT3Client } from "./gpt3.ts";
 import {
-  Guesser,
+  GuessNominator,
   WordSet,
   AttributedGuess,
   PartialGameState,
@@ -34,7 +34,7 @@ Remaining Words: band, block, cat, centaur, crown, dog, fair, fence, head, mint,
 
 End of Game 1`;
 
-export class GPT3Guesser implements Guesser {
+export class GPT3GuessNominator implements GuessNominator {
   id = "GPT3Guesser";
   team = "Red";
   gpt3_client: GPT3Client;
@@ -99,7 +99,7 @@ export class GPT3Guesser implements Guesser {
     return prompt;
   }
 
-  async guess(hint: Hint): Promise<AttributedGuess[]> {
+  async nominate(hint: Hint): Promise<AttributedGuess[]> {
     const prompt = this.construct_prompt(hint);
     const completion = await this.gpt3_client.complete({
       prompt: prompt,
