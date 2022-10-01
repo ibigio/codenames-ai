@@ -3,6 +3,7 @@ export interface Hint {
   number: number;
 }
 
+export type WordType = "red" | "blue" | "neutral" | "black";
 export type WordSet = string[];
 
 export interface AttributedHint {
@@ -26,10 +27,7 @@ interface Turn {
 
 export interface CompleteGameState {
   words: {
-    red: string[];
-    blue: string[];
-    neutral: string[];
-    black: string[];
+    [key in WordType]: string[];
   };
   turns: Turn[];
 }

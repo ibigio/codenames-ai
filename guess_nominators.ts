@@ -39,12 +39,12 @@ export class GPT3GuessNominator implements GuessNominator {
   team = "Red";
   gpt3_client: GPT3Client;
   game_state?: PartialGameState;
-  num_guesses: number;
+  num_nominations: number;
 
-  constructor(game_state?: PartialGameState, num_guesses?: number) {
+  constructor(num_nominations?: number, game_state?: PartialGameState) {
     this.game_state = game_state;
     this.gpt3_client = new GPT3Client();
-    this.num_guesses = num_guesses ?? 1;
+    this.num_nominations = num_nominations ?? 1;
   }
 
   get_game_state(): PartialGameState {
@@ -100,11 +100,12 @@ export class GPT3GuessNominator implements GuessNominator {
   }
 
   async nominate(hint: Hint): Promise<AttributedGuess[]> {
+    this.get_game_state(); // validate game state
     const prompt = this.construct_prompt(hint);
     const completion = await this.gpt3_client.complete({
       prompt: prompt,
       stop: ["Remaining Words"],
-      n: this.num_guesses,
+      n: this.num_nominations,
     });
 
     if (completion == undefined) {

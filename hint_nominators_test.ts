@@ -38,8 +38,12 @@ Intended Words: (alps, death)
 Final Hint: (frozen, 2)
 `;
 
+const test_hint_nominator = (n?: number) => {
+  return new GPT3HintNominator(n ?? 1, sample_complete_game_state);
+};
+
 Deno.test("game_state format", () => {
-  const n = new GPT3HintNominator(sample_complete_game_state);
+  const n = test_hint_nominator();
   const f = n.format_game_state();
   assert(
     f.includes(`Remaining Words
@@ -52,7 +56,7 @@ Black Word: sand`)
 });
 
 Deno.test("construct prompt", () => {
-  const n = new GPT3HintNominator(sample_complete_game_state);
+  const n = test_hint_nominator();
   const prompt = n.construct_prompt();
   assert(
     prompt.includes(`Red Hint
@@ -62,7 +66,7 @@ Thought Process:`)
 });
 
 Deno.test("parse response", () => {
-  const n = new GPT3HintNominator(sample_complete_game_state);
+  const n = test_hint_nominator();
   const parsed_hint = n.parse_response(sample_hint);
   const expected_hint = {
     hint: { word: "frozen", number: 2 },
@@ -77,13 +81,13 @@ Deno.test("parse response", () => {
 });
 
 Deno.test("nominate hint", async () => {
-  const n = new GPT3HintNominator(sample_complete_game_state);
+  const n = test_hint_nominator();
   const nominations = await n.nominate();
   console.log(nominations);
 });
 
 Deno.test("nominate multiple hints", async () => {
-  const n = new GPT3HintNominator(sample_complete_game_state, 3);
+  const n = test_hint_nominator(3);
   const nominations = await n.nominate();
   console.log(nominations);
 });

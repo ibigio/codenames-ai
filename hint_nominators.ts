@@ -65,7 +65,7 @@ export class GPT3HintNominator implements HintNominator {
   game_state?: CompleteGameState;
   num_nominations: number;
 
-  constructor(game_state?: CompleteGameState, num_nominations?: number) {
+  constructor(num_nominations?: number, game_state?: CompleteGameState) {
     this.game_state = game_state;
     this.gpt3_client = new GPT3Client();
     this.num_nominations = num_nominations ?? 1;
@@ -157,6 +157,7 @@ export class GPT3HintNominator implements HintNominator {
   }
 
   async nominate(): Promise<AttributedHint[]> {
+    this.get_game_state(); // validate game state
     const prompt = this.construct_prompt();
     const completion = await this.gpt3_client.complete({
       prompt: prompt,
